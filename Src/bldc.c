@@ -81,6 +81,19 @@ static int16_t offsetdcr    = 2000;
 int16_t        batVoltage       = (400 * BAT_CELLS * BAT_CALIB_ADC) / BAT_CALIB_REAL_VOLTAGE;
 static int32_t batVoltageFixdt  = (400 * BAT_CELLS * BAT_CALIB_ADC) / BAT_CALIB_REAL_VOLTAGE << 16;  // Fixed-point filter output initialized at 400 V*100/cell = 4 V/cell converted to fixed-point
 
+int16_t odom_l = 0;
+int16_t odom_r = 0;
+
+static uint16_t wp_l_vorher = 0;
+static uint16_t wp_r_vorher = 0;
+
+int16_t up_or_down(int16_t vorher, int16_t nachher){
+  uint16_t up_down[6] = {0,-1,-2,0,2,1};
+  uint16_t mod_diff =  (((vorher - nachher) % 6) + 6) % 6;
+  
+  return up_down[mod_diff];
+}
+
 // =================================
 // DMA interrupt frequency =~ 16 kHz
 // =================================
@@ -199,6 +212,14 @@ void DMA1_Channel1_IRQHandler(void) {
   // errCodeLeft  = rtY_Left.z_errCode;
   // motSpeedLeft = rtY_Left.n_mot;
   // motAngleLeft = rtY_Left.a_elecAngle;
+  uint8_t encoding = (uint8_t)((hall_ul<<2) + (hall_vl<<1) + hall_wl);
+  int wheel_pos = rtConstP.vec_hallToPos_Value[encoding];
+  
+  odom_l = odom_l + up_or_down(wp_l_vorher, wheel_pos);
+  wp_l_vorher = wheel_pos;
+  
+  //odom_l = odom_l + (int)((elecAngle_l_vorher + dist - rtY_Left.a_elecAngle) % 6 == 0 ? dist : -dist);
+  //elecAngle_l_vorher = rtY_Left.a_elecAngle;
 
     /* Apply commands */
     LEFT_TIM->LEFT_TIM_U    = (uint16_t)CLAMP(ul + pwm_res / 2, pwm_margin, pwm_res-pwm_margin);
@@ -237,6 +258,12 @@ void DMA1_Channel1_IRQHandler(void) {
  // errCodeRight  = rtY_Right.z_errCode;
  // motSpeedRight = rtY_Right.n_mot;
  // motAngleRight = rtY_Right.a_elecAngle;
+
+  encoding = (uint8_t)((hall_ur<<2) + (hall_vr<<1) + hall_wr);
+  wheel_pos = rtConstP.vec_hallToPos_Value[encoding];
+  
+  odom_r = odom_r - up_or_down(wp_r_vorher, wheel_pos);
+  wp_r_vorher = wheel_pos;
 
     /* Apply commands */
     RIGHT_TIM->RIGHT_TIM_U  = (uint16_t)CLAMP(ur + pwm_res / 2, pwm_margin, pwm_res-pwm_margin);
