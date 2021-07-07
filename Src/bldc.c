@@ -212,15 +212,12 @@ void DMA1_Channel1_IRQHandler(void) {
   // errCodeLeft  = rtY_Left.z_errCode;
   // motSpeedLeft = rtY_Left.n_mot;
   // motAngleLeft = rtY_Left.a_elecAngle;
-  uint8_t encoding = (uint8_t)((hall_ul<<2) + (hall_vl<<1) + hall_wl);
-  int wheel_pos = rtConstP.vec_hallToPos_Value[encoding];
+    uint8_t encoding = (uint8_t)((hall_ul<<2) + (hall_vl<<1) + hall_wl);
+    int wheel_pos = rtConstP.vec_hallToPos_Value[encoding];
   
-  odom_l = odom_l + up_or_down(wp_l_vorher, wheel_pos);
-  wp_l_vorher = wheel_pos;
+    odom_l = odom_l + up_or_down(wp_l_vorher, wheel_pos);
+    wp_l_vorher = wheel_pos;
   
-  //odom_l = odom_l + (int)((elecAngle_l_vorher + dist - rtY_Left.a_elecAngle) % 6 == 0 ? dist : -dist);
-  //elecAngle_l_vorher = rtY_Left.a_elecAngle;
-
     /* Apply commands */
     LEFT_TIM->LEFT_TIM_U    = (uint16_t)CLAMP(ul + pwm_res / 2, pwm_margin, pwm_res-pwm_margin);
     LEFT_TIM->LEFT_TIM_V    = (uint16_t)CLAMP(vl + pwm_res / 2, pwm_margin, pwm_res-pwm_margin);
@@ -259,11 +256,11 @@ void DMA1_Channel1_IRQHandler(void) {
  // motSpeedRight = rtY_Right.n_mot;
  // motAngleRight = rtY_Right.a_elecAngle;
 
-  encoding = (uint8_t)((hall_ur<<2) + (hall_vr<<1) + hall_wr);
-  wheel_pos = rtConstP.vec_hallToPos_Value[encoding];
+    encoding = (uint8_t)((hall_ur<<2) + (hall_vr<<1) + hall_wr);
+    wheel_pos = rtConstP.vec_hallToPos_Value[encoding];
   
-  odom_r = odom_r - up_or_down(wp_r_vorher, wheel_pos);
-  wp_r_vorher = wheel_pos;
+    odom_r = odom_r - up_or_down(wp_r_vorher, wheel_pos);
+    wp_r_vorher = wheel_pos;
 
     /* Apply commands */
     RIGHT_TIM->RIGHT_TIM_U  = (uint16_t)CLAMP(ur + pwm_res / 2, pwm_margin, pwm_res-pwm_margin);

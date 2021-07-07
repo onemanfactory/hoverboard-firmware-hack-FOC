@@ -32,7 +32,6 @@
 
 #include <SoftwareSerial.h>
 SoftwareSerial HoverSerial(2,3);        // RX, TX
-//SoftwareSerial HoverSerial2(4,5);        // RX, TX
 
 // Global variables
 uint8_t idx = 0;                        // Index for new data pointer
@@ -72,7 +71,6 @@ void setup()
   Serial.println("Hoverboard Serial v1.0");
 
   HoverSerial.begin(HOVER_SERIAL_BAUD);
-  //HoverSerial2.begin(HOVER_SERIAL_BAUD);
   
   pinMode(LED_BUILTIN, OUTPUT);
 }
@@ -88,7 +86,6 @@ void Send(int16_t uSteer, int16_t uSpeed)
 
   // Write to Serial
   HoverSerial.write((uint8_t *) &Command, sizeof(Command));
-  //HoverSerial2.write((uint8_t *) &Command, sizeof(Command)); 
 }
 
 // ########################## RECEIVE ##########################
@@ -167,10 +164,8 @@ void loop(void)
   // Send commands
   if (iTimeSend > timeNow) return;
   iTimeSend = timeNow + TIME_SEND;
-  int power = (SPEED_MAX_TEST - 2*abs(iTest));
-  Send(0, power);
-  //Serial.println(power);
-
+  Send(0, SPEED_MAX_TEST - 2*abs(iTest));
+  
   // Calculate test command signal
   iTest += 1;
   if (iTest > iTestMax) iTest = -iTestMax;
