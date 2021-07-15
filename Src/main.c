@@ -481,7 +481,7 @@ int main(void) {
           if(__HAL_DMA_GET_COUNTER(huart3.hdmatx) == 0) {
             Feedback.cmdLed     = (uint16_t)sideboard_leds_R;
             Feedback.checksum   = (uint16_t)(Feedback.start ^ Feedback.cmd1 ^ Feedback.cmd2 ^ Feedback.speedR_meas ^ Feedback.speedL_meas 
-                                           ^ Feedback.batVoltage ^ Feedback.boardTemp ^ Feedback.cmdLed);
+                                           ^ Feedback.wheelR_cnt ^ Feedback.wheelL_cnt ^ Feedback.batVoltage ^ Feedback.boardTemp ^ Feedback.cmdLed);
 
             HAL_UART_Transmit_DMA(&huart3, (uint8_t *)&Feedback, sizeof(Feedback));
           }
